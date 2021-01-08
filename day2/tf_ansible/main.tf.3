@@ -1,0 +1,45 @@
+# Configure instance
+resource "google_compute_instance" "default" {
+  name         = "webserver"
+  machine_type = "n1-standard-1"
+  zone         = "us-central1-a"
+
+  # Tag instance for firewall assignment
+  tags = ["web"]
+
+  boot_disk {
+    initialize_params {
+      image = "ubuntu-os-cloud/ubuntu-2004-lts"
+    }
+  }
+
+  # Add networking to instance
+  network_interface {
+    network = "default"
+    access_config {
+    }
+  }
+
+  # Upload SSH keys for access
+  metadata = {
+    ssh-keys = "${var.ssh_user}:${file(var.public_key)}"
+  }
+
+  # Ensure system is up and responsive before running Ansible
+  provisioner "remote-exec" {
+    inline = ["echo 'Hello World'"]
+
+    connection {
+      type        = "ssh"
+      user        = var.ssh_user
+      private_key = file(var.private_key)
+      host        = google_compute_instance.default.network_interface.0.access_config.0.nat_ip
+    }
+  }
+
+  # Run Ansible playbook
+  provisioner "local-exec" {
+    command = "ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook -i '${google_compute_instance.default.network_interface.0.access_config.0.nat_ip},' --user ${var.ssh_user} --private-key ${var.private_key} nginx_install.yml"
+  }
+
+}
