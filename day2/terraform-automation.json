@@ -1,8 +1,8 @@
 {
   "type": "service_account",
   "project_id": "jhill-2741611427",
-  "private_key_id": "e24f34a386894e30bf8f76b3d90d54170f89384d",
-  "private_key": "<the_key>",
+  "private_key_id": "<key_id>",
+  "private_key": "<key>",
   "client_email": "terraform-automation@jhill-2741611427.iam.gserviceaccount.com",
   "client_id": "109740073230847723917",
   "auth_uri": "https://accounts.google.com/o/oauth2/auth",
